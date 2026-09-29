@@ -1,0 +1,1669 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Thrive — Become an Early Bird</title>
+<meta name="description" content="Join the Thrive waitlist. Be first to play the upcoming indie survival card game where cute animals get ruthless." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --paper: #F4E9D6;
+    --paper-2: #EADBC1;
+    --paper-3: #E1CFAF;
+    --ink: #2A2520;
+    --ink-soft: #4A3F36;
+    --coral: #E89870;
+    --coral-deep: #D6764B;
+    --head-ink: #191818;
+    --leaf: #2F6B3E;
+    --leaf-deep: #245530;
+    --leaf-soft: #88A878;
+    --acorn: #6B4A2A;
+    --rule: rgba(42, 37, 32, 0.16);
+
+    /* hero artwork vertical framing (object-position Y). original: 30% */
+    --hero-y: 23%;
+    /* extra vertical nudge for the animal-bearing layers (branch + solo) */
+    --animal-y: 0px;
+
+    /* gold foil ramp */
+    --foil: linear-gradient(125deg,
+      #7d550f 0%, #b9893150 0%, #cfa341 16%, #f1dd9a 31%,
+      #fff7da 41%, #e7c061 53%, #b07f20 68%, #efd485 84%, #8a611a 100%);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter Tight', -apple-system, system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  h1, h2, h3 {
+    font-family: 'Bricolage Grotesque', serif;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.0;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-feature-settings: "tnum" 1;
+  }
+
+  /* ===================== STAGE ===================== */
+  .stage {
+    display: grid;
+    grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
+    height: 100dvh;
+    width: 100vw;
+    position: relative;
+  }
+
+  /* ===================== HERO (left) ===================== */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(180deg, #9fc0cf 0%, #f3e6bd 55%, #c9cf95 100%);
+  }
+  .parallax {
+    position: absolute;
+    inset: 0;
+    --mx: 0; --my: 0;
+  }
+  /* two stacked scenes let us cross-fade between animals with no mid-swap
+     flash — only the .is-active scene is visible */
+  .parallax .scene {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity .55s ease;
+  }
+  .parallax .scene.is-active { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    .parallax .scene { transition: opacity .2s linear; }
+  }
+  .parallax .layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 47% var(--hero-y, 30%);
+    display: block;
+    will-change: transform;
+    backface-visibility: hidden;
+  }
+  /* depth: sky drifts least, branch/character most */
+  .parallax .sky {
+    transform: translate3d(calc(var(--mx) * 7px), calc(var(--my) * 7px), 0) scale(1.13);
+  }
+  .parallax .tree {
+    transform: translate3d(calc(var(--mx) * 17px), calc(var(--my) * 15px), 0) scale(1.13);
+  }
+  /* distant flock: drifts the least of any layer so it reads as furthest away */
+  .parallax .tree.is-birds {
+    transform: translate3d(calc(var(--mx) * 3px), calc(var(--my) * 3px), 0) scale(1.1);
+  }
+  /* the character (solo) overlay rides the exact same depth as the branch.
+     --animal-y lets us nudge just these two layers up/down independently. */
+  .parallax .branch,
+  .parallax .solo {
+    transform: translate3d(calc(var(--mx) * 33px), calc(var(--my) * 26px + var(--animal-y, 0px)), 0) scale(1.16);
+  }
+  .parallax .solo { pointer-events: none; }
+  /* bubble layers: exaggerated parallax spread sells underwater depth — the
+     distant motes drift gently behind, the foreground bubbles swoop hard.
+     a slow ambient rise (via the independent `translate` property, so it
+     composes with the pointer transform) keeps the water feeling alive. */
+  .parallax .bubbles-back {
+    transform: translate3d(calc(var(--mx) * -10px), calc(var(--my) * 10px), 0) scale(1.14);
+  }
+  .parallax .bubbles-front {
+    transform: translate3d(calc(var(--mx) * 62px), calc(var(--my) * 50px), 0) scale(1.24);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .parallax .bubbles-back { animation: bubbleRiseA 9.5s ease-in-out infinite; }
+    .parallax .bubbles-front { animation: bubbleRiseB 7s ease-in-out infinite; }
+  }
+  @keyframes bubbleRiseA {
+    0%, 100% { translate: 0 6px; }
+    50% { translate: 0 -16px; }
+  }
+  @keyframes bubbleRiseB {
+    0%, 100% { translate: 0 14px; }
+    50% { translate: 0 -28px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .parallax .layer { transform: scale(1.04) !important; }
+  }
+  /* depth + edge vignette so it never feels like a flat stock photo */
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(120% 90% at 30% 20%, transparent 40%, rgba(20,28,18,0.42) 100%),
+      linear-gradient(90deg, transparent 72%, rgba(28,34,24,0.55) 100%);
+  }
+  /* ===================== ORGANIC TORN DIVIDER ===================== */
+  /* a paper "flap" that tears over the right edge of the hero photo.
+     sits ABOVE the hero artwork (incl. nutty-solo, z1) but BELOW the
+     form panel (z5), so the form always stays clear of the tear. */
+  .tear {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 51%;            /* the hero/panel column seam */
+    width: 96px;
+    margin-left: -80px;   /* juts ~80px left into the hero, 16px tucked under panel */
+    z-index: 4;
+    background: var(--paper);
+    pointer-events: none;
+    /* narrow, irregular split-wood edge: tight band with straight vertical
+       runs broken by the occasional angular notch (not a uniform zig-zag) */
+    -webkit-clip-path: polygon(
+      72px 0%, 72px 6%, 64px 9%, 80px 12%, 80px 18%, 58px 21%, 70px 24%,
+      70px 31%, 84px 34%, 74px 37%, 66px 40%, 66px 47%, 78px 50%, 60px 53%,
+      72px 56%, 72px 63%, 82px 66%, 68px 70%, 68px 77%, 56px 80%, 74px 83%,
+      74px 89%, 80px 92%, 64px 95%, 70px 100%,
+      100% 100%, 100% 0%);
+    clip-path: polygon(
+      72px 0%, 72px 6%, 64px 9%, 80px 12%, 80px 18%, 58px 21%, 70px 24%,
+      70px 31%, 84px 34%, 74px 37%, 66px 40%, 66px 47%, 78px 50%, 60px 53%,
+      72px 56%, 72px 63%, 82px 66%, 68px 70%, 68px 77%, 56px 80%, 74px 83%,
+      74px 89%, 80px 92%, 64px 95%, 70px 100%,
+      100% 100%, 100% 0%);
+    filter: drop-shadow(-4px 0 6px rgba(20,16,10,0.26));
+  }
+  /* carry the same paper grain across the torn flap */
+  .tear::before {
+    content: "";
+    position: absolute; inset: 0; pointer-events: none;
+    background-image: radial-gradient(circle at 1px 1px, rgba(42,37,32,0.06) 1px, transparent 0);
+    background-size: 3px 3px;
+    mix-blend-mode: multiply;
+    opacity: 0.55;
+  }
+
+  /* hero overlay copy bottom-left */
+  .hero-copy {
+    position: absolute;
+    left: clamp(26px, 3.4vw, 54px);
+    bottom: clamp(26px, 4vh, 48px);
+    right: clamp(26px, 3.4vw, 54px);
+    z-index: 2;
+    color: #FBF3E2;
+  }
+  .hero-tag--br {
+    position: absolute;
+    bottom: clamp(20px, 3.5vh, 42px);
+    right: clamp(26px, 3.4vw, 54px);
+    z-index: 3;
+    margin-bottom: 0;
+  }
+
+  /* ===================== CHARACTER SWITCHER ===================== */
+  /* the floating "NUTTY" tag is now a button that opens a menu above it,
+     letting you swap the whole parallax scene for another animal. */
+  .animal-switcher {
+    position: absolute;
+    bottom: clamp(20px, 3.5vh, 42px);
+    right: clamp(26px, 3.4vw, 54px);
+    z-index: 6;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+  }
+  .animal-trigger {
+    margin-bottom: 0;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: background .16s ease, border-color .16s ease, transform .16s ease;
+  }
+  .animal-trigger:hover { background: rgba(20,28,18,0.58); border-color: rgba(244,233,214,0.5); }
+  .animal-trigger:active { transform: translateY(1px); }
+  .animal-switcher.is-locked{display:none}
+  .animal-trigger:focus-visible { outline: 2px solid var(--coral); outline-offset: 2px; }
+  .animal-caret {
+    width: 11px; height: 11px;
+    transition: transform .26s cubic-bezier(.2,.8,.3,1.1);
+  }
+  .animal-trigger[aria-expanded="true"] .animal-caret { transform: rotate(180deg); }
+
+  .animal-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    width: 200px;
+    padding: 7px;
+    background: rgba(18,26,16,0.66);
+    border: 1px solid rgba(244,233,214,0.26);
+    backdrop-filter: blur(9px);
+    -webkit-backdrop-filter: blur(9px);
+    border-radius: 16px;
+    box-shadow: 0 16px 36px rgba(10,16,8,0.42);
+    transform-origin: bottom right;
+    opacity: 1;
+  }
+  .animal-menu[hidden] { display: none; }
+  @media (prefers-reduced-motion: no-preference) {
+    .animal-menu:not([hidden]) { animation: animalMenuPop .24s cubic-bezier(.2,.8,.3,1.12); }
+  }
+  @keyframes animalMenuPop {
+    from { opacity: 0; transform: translateY(8px) scale(.95); }
+    to { opacity: 1; transform: none; }
+  }
+  .animal-opt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 11px;
+    border: none;
+    background: transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: left;
+    color: #F4E9D6;
+    transition: background .15s ease;
+  }
+  .animal-opt:hover { background: rgba(244,233,214,0.12); }
+  .animal-opt:focus-visible { outline: 2px solid var(--coral); outline-offset: -2px; }
+  .animal-opt[aria-checked="true"] { background: rgba(232,152,112,0.2); }
+  .animal-dot { display: none; }
+  .animal-name {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.005em;
+  }
+  .animal-kind {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(244,233,214,0.6);
+  }
+  /* while the next scene's images decode, lock + pulse the trigger dot */
+  .animal-switcher.is-loading .animal-trigger { pointer-events: none; opacity: 0.78; }
+  .animal-switcher.is-loading .animal-trigger::before {
+    animation: animalPulse .7s ease-in-out infinite;
+  }
+  @keyframes animalPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #F4E9D6;
+    background: rgba(20,28,18,0.42);
+    border: 1px solid rgba(244,233,214,0.32);
+    backdrop-filter: blur(3px);
+    padding: 7px 13px;
+    border-radius: 999px;
+    margin-bottom: 16px;
+  }
+  /* trigger bubble text matches the list names (Bricolage Grotesque, title-case) */
+  .animal-trigger { text-transform: none; letter-spacing: 0.005em; }
+  .animal-trigger-name {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.005em;
+    text-transform: none;
+  }
+  .hero-copy h2 {
+    font-size: clamp(30px, 3.5vw, 50px);
+    color: #FFF7E8;
+    text-shadow: 0 2px 18px rgba(18,24,16,0.5);
+    max-width: 13ch;
+  }
+  .hero-copy h2 em {
+    font-style: normal;
+    color: var(--coral);
+  }
+  /* the character adjective ("Cute" / "Hungry") cross-fades on swap */
+  .hero-adj {
+    display: inline-block;
+    transition: opacity .28s ease, transform .28s ease;
+  }
+  .hero-adj.is-swapping {
+    opacity: 0;
+    transform: translateY(-0.12em);
+  }
+  .hero-copy p {
+    margin: 12px 0 0;
+    font-size: clamp(14px, 1.05vw, 16px);
+    max-width: 34ch;
+    color: rgba(251,243,226,0.86);
+    text-shadow: 0 1px 10px rgba(18,24,16,0.5);
+    text-wrap: pretty;
+  }
+
+  /* ===================== FORM SIDE (right) ===================== */
+  .panel {
+    position: relative;
+    z-index: 5;
+    background:
+      radial-gradient(140% 120% at 100% 0%, var(--paper-2) 0%, var(--paper) 55%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* extra bottom padding reserves room for the absolutely-positioned
+       copyright line that sits just below the socials/logo row */
+    padding: clamp(22px, 3.2vh, 40px) clamp(28px, 4vw, 62px) clamp(48px, 6.4vh, 72px);
+    overflow: hidden;
+  }
+  /* paper grain */
+  .panel::before {
+    content: "";
+    position: absolute; inset: 0; pointer-events: none;
+    background-image: radial-gradient(circle at 1px 1px, rgba(42,37,32,0.06) 1px, transparent 0);
+    background-size: 3px 3px;
+    mix-blend-mode: multiply;
+    opacity: 0.55;
+  }
+  /* pressed early-bird stamp, faded into the top-right corner */
+  .page-stamp {
+    position: absolute;
+    top: clamp(-26px, -2vw, -14px);
+    right: clamp(-30px, -2.4vw, -16px);
+    width: clamp(150px, 17vw, 230px);
+    aspect-ratio: 613 / 647;
+    z-index: 1;
+    pointer-events: none;
+    transform: rotate(15deg);
+    -webkit-mask: url('assets/early-bird-badge.png') center/contain no-repeat;
+    mask: url('assets/early-bird-badge.png') center/contain no-repeat;
+    background: var(--acorn);
+    opacity: 0.16;
+    mix-blend-mode: multiply;
+    transition: transform 1.05s cubic-bezier(.34,1.2,.32,1), opacity 1.05s ease;
+  }
+  /* on submit the stamp swoops across to the top-left, scaling up + rotating
+     (the exact translate is measured + set inline by JS so it lands at the
+     top-left of the content column on any screen size) */
+
+  .panel-inner {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 470px;
+    margin: 0 auto;
+  }
+  /* form + success share one region whose height is pinned to the form's, so
+     the footer below never jumps when the shorter success state swaps in. */
+  .states-wrap {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* Thrive logo over the hero, top-left */
+  .hero-logo {
+    position: absolute;
+    top: clamp(20px, 3.2vh, 34px);
+    left: clamp(22px, 3vw, 40px);
+    height: clamp(40px, 6vh, 60px);
+    width: auto;
+    z-index: 3;
+    filter: drop-shadow(0 3px 11px rgba(18,26,14,0.5));
+  }
+
+  /* early-bird stamp — inline beside the heading */
+  .lede-head {
+    display: flex;
+    align-items: center;
+    gap: clamp(12px, 1.6vw, 18px);
+    margin-bottom: 10px;
+  }
+  .lede-head h1 { margin: 0; }
+
+  .stamp {
+    flex-shrink: 0;
+    width: clamp(50px, 6vw, 66px);
+    aspect-ratio: 613 / 647;
+    transform: rotate(7deg);
+    filter: drop-shadow(0 3px 7px rgba(122,86,18,0.28));
+  }
+  /* brushed-gold fill with a soft sheen that sweeps with the pointer (--shine 0..1) */
+  .stamp .foil {
+    width: 100%; height: 100%;
+    -webkit-mask: url('assets/early-bird-badge.png') center/contain no-repeat;
+    mask: url('assets/early-bird-badge.png') center/contain no-repeat;
+    background-color: #cfa44e;
+    background-image:
+      linear-gradient(108deg,
+        transparent 36%,
+        rgba(255,248,224,0.42) 47%,
+        rgba(255,253,243,0.66) 50%,
+        rgba(255,248,224,0.42) 53%,
+        transparent 64%),
+      linear-gradient(158deg, #b78a39 0%, #d6af58 40%, #e6c673 58%, #bd9038 100%);
+    background-size: 260% 100%, 100% 100%;
+    background-position: calc(var(--shine, 0.5) * 100%) 0, 0 0;
+    background-repeat: no-repeat;
+  }
+
+  .lede h1 {
+    font-size: clamp(32px, 4.4vh, 46px);
+  }
+  .lede h1 em { font-style: normal; color: var(--coral-deep); }
+  .lede p {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: clamp(14px, 1.6vh, 16px);
+    max-width: 42ch;
+    text-wrap: pretty;
+  }
+
+  /* ===================== INTRO / LANDING ===================== */
+  .intro { opacity: 1; }
+  @media (prefers-reduced-motion: no-preference) {
+    .intro { animation: stepIn .5s cubic-bezier(.2,.7,.3,1); }
+  }
+  .intro[hidden] { display: none; }
+  .intro-top {
+    display: flex; align-items: center; gap: 11px;
+    margin-bottom: clamp(26px, 5vh, 46px);
+  }
+  .intro-top .stamp { width: 38px; transform: rotate(7deg); }
+  .intro-top .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .intro-kicker {
+    margin: 0 0 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase;
+    color: var(--leaf);
+    display: inline-flex; align-items: center; gap: 9px;
+  }
+  .intro-kicker::before {
+    content: ""; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--coral); flex-shrink: 0;
+  }
+  .intro h1 {
+    font-size: clamp(40px, 6.4vh, 64px);
+    line-height: 0.98;
+  }
+  .intro h1 em { font-style: normal; color: var(--coral-deep); }
+  .intro-sub {
+    margin: clamp(14px, 2.2vh, 20px) 0 0;
+    color: var(--ink-soft);
+    font-size: clamp(15px, 1.9vh, 17.5px);
+    line-height: 1.55;
+    max-width: 40ch;
+    text-wrap: pretty;
+  }
+  .start {
+    margin-top: clamp(24px, 4vh, 38px);
+    display: inline-flex; align-items: center; justify-content: center; gap: 11px;
+    padding: 17px 34px; border-radius: 999px;
+    font-family: inherit; font-weight: 700; font-size: 17px;
+    color: #fff; background: var(--coral); border: 2px solid var(--coral-deep);
+    box-shadow: 0 5px 0 0 var(--coral-deep); cursor: pointer;
+    transition: transform .16s ease, box-shadow .16s ease, background .16s ease;
+  }
+  .start:hover { transform: translateY(-2px); box-shadow: 0 7px 0 0 var(--coral-deep); background: #eca47e; }
+  .start:active { transform: translateY(2px); box-shadow: 0 3px 0 0 var(--coral-deep); }
+  .start .seed { font-size: 19px; line-height: 1; }
+  .intro-meta {
+    margin: clamp(14px, 2.2vh, 18px) 0 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; letter-spacing: 0.05em;
+    color: var(--ink-soft);
+    display: flex; align-items: center; gap: 9px;
+  }
+  .intro-meta .sep { width: 4px; height: 4px; border-radius: 50%; background: var(--rule); }
+
+  /* ===================== STEPPER FORM ===================== */
+  form { margin-top: 0; }
+
+  /* persistent compact brand + progress */
+  .step-top {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px;
+    margin-bottom: clamp(22px, 4vh, 38px);
+  }
+  .brand-mini { display: flex; align-items: center; gap: 11px; }
+  .brand-mini .stamp { width: 34px; transform: rotate(7deg); }
+  .brand-mini .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .progress { display: flex; align-items: center; gap: 7px; }
+  .progress .dot {
+    width: 8px; height: 8px; border-radius: 999px;
+    background: var(--rule);
+    transition: background .25s ease, width .25s ease;
+  }
+  .progress .dot.done { background: var(--leaf-soft); }
+  .progress .dot.active { background: var(--coral); width: 22px; }
+
+  /* one question at a time */
+  .steps { position: relative; }
+  .step { display: none; }
+  .step.active { display: block; }
+  @keyframes stepIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: no-preference) { .step.active { animation: stepIn .42s cubic-bezier(.2,.7,.3,1); } }
+
+  .q-kicker {
+    margin: 0 0 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase;
+    color: var(--leaf);
+    display: inline-flex; align-items: center; gap: 9px;
+  }
+  .q-kicker .opt-tag {
+    color: var(--ink-soft);
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    padding: 1px 8px; border-radius: 999px; letter-spacing: 0.06em;
+  }
+  .q {
+    font-family: 'Bricolage Grotesque', serif;
+    font-weight: 800; letter-spacing: -0.02em; line-height: 1.04;
+    font-size: clamp(28px, 4.2vh, 42px);
+    margin: 0 0 9px;
+    text-wrap: balance;
+  }
+  .q em { font-style: normal; color: var(--coral-deep); }
+  .q-help {
+    margin: 0 0 clamp(18px, 2.6vh, 24px);
+    color: var(--ink-soft);
+    font-size: clamp(14px, 1.7vh, 15.5px);
+    max-width: 38ch;
+    text-wrap: pretty;
+  }
+
+  /* ===================== SINGLE-PANEL FORM ===================== */
+  .lede { margin-bottom: clamp(18px, 3vh, 26px); }
+  .lede h1 { font-size: clamp(30px, 4.6vh, 46px); margin: 0 0 8px; }
+  .lede h1 em { font-style: normal; color: var(--coral-deep); }
+  .lede h1 .h-ink { color: var(--head-ink); }
+  .lede h1 .h-accent { color: var(--coral-deep); }
+  .lede p { margin: 0; color: var(--ink-soft); font-size: clamp(14px, 1.7vh, 16px); max-width: 40ch; text-wrap: pretty; }
+
+  form.single { display: flex; flex-direction: column; gap: clamp(13px, 2.1vh, 18px); }
+  .field { display: flex; flex-direction: column; gap: 7px; }
+  .fl {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.11em; text-transform: uppercase;
+    color: var(--ink-soft);
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .grid.two { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(13px, 2.1vh, 18px); }
+
+  /* required-field tag */
+  .req-tag {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--coral-deep);
+    background: color-mix(in oklab, var(--coral-deep) 12%, var(--paper));
+    border: 1px solid color-mix(in oklab, var(--coral-deep) 30%, transparent);
+    padding: 1px 7px; border-radius: 999px; letter-spacing: 0.05em; font-size: 10px;
+    font-weight: 700; text-transform: uppercase;
+  }
+
+  /* input + inline action button (e.g. Randomise) */
+  .input-row { display: flex; align-items: stretch; gap: 9px; }
+  .input-row .input { flex: 1 1 auto; min-width: 0; }
+  .animal-wrap { position: relative; flex: 1 1 auto; min-width: 0; display: flex; }
+  .animal-wrap .input { flex: 1 1 auto; min-width: 0; }
+  .animal-wrap .input { padding-right: 44px; }
+  .animal-wrap .input.rolling { color: color-mix(in srgb, currentColor 55%, transparent); filter: blur(.4px); }
+  .animal-wrap .input.landed { animation: animalLand .4s cubic-bezier(.2,1.3,.4,1); }
+  @keyframes animalLand {
+    0% { transform: scale(.9); }
+    55% { transform: scale(1.06); }
+    100% { transform: scale(1); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .animal-wrap .input.landed { animation: none; }
+  }
+  .animal-clear {
+    position: absolute; top: 50%; right: 10px; transform: translateY(-50%);
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 26px; height: 26px; padding: 0;
+    border: none; border-radius: 50%; cursor: pointer;
+    color: var(--ink-soft); background: transparent;
+    transition: background .15s ease, color .15s ease;
+  }
+  .animal-clear svg { width: 15px; height: 15px; }
+  .animal-clear:hover { background: rgba(42,37,32,0.08); color: var(--ink); }
+  .animal-clear[hidden] { display: none; }
+  .dice-btn {
+    flex: 0 0 auto;
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 0 18px;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 15px; font-weight: 600;
+    color: #FBF3E2;
+    background: var(--leaf-deep);
+    border: 2px solid var(--leaf-deep);
+    border-radius: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: transform .15s ease, background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .dice-btn:hover {
+    background: var(--leaf);
+    color: #FBF3E2;
+    border-color: var(--leaf);
+    transform: translateY(-1px);
+  }
+  .dice-btn:active { transform: translateY(1px); }
+  .dice-btn:disabled { opacity: 0.55; cursor: default; pointer-events: none; }
+  .dice-btn svg { transition: transform .4s cubic-bezier(.2,.7,.3,1.4); }
+  .dice-btn.spin svg { transform: rotate(180deg); }
+  form.single .input { padding: 13px 16px; font-size: 16.5px; }
+
+  /* location pin tucked inside the postal-address input (mirrors the date
+     picker's inline calendar icon) */
+  .input-wrap { position: relative; display: flex; }
+  .input-wrap .input { flex: 1 1 auto; min-width: 0; }
+  form.single .input.has-geo { padding-right: 48px; }
+  .geo-btn {
+    position: absolute;
+    right: 7px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 34px; height: 34px;
+    display: grid; place-items: center;
+    border-radius: 10px;
+    color: var(--leaf-deep);
+    background: var(--paper-2);
+    border: 1.5px solid var(--rule);
+    cursor: pointer;
+    transition: transform .15s ease, background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .geo-btn:hover { background: var(--leaf); color: #FBF3E2; border-color: var(--leaf-deep); }
+  .geo-btn:active { transform: translateY(-50%) scale(.93); }
+  .geo-btn svg { width: 17px; height: 17px; display: block; }
+  .geo-btn .spin { display: none; }
+  .geo-btn.loading { pointer-events: none; }
+  .geo-btn.loading .pin { display: none; }
+  .geo-btn.loading .spin { display: block; animation: geospin .8s linear infinite; }
+  @keyframes geospin { to { transform: rotate(360deg); } }
+
+  /* hidden native date input — anchors the calendar popup under the button */
+  .bday-native {
+    position: absolute;
+    right: 7px; top: 50%;
+    transform: translateY(-50%);
+    width: 34px; height: 34px;
+    opacity: 0;
+    border: 0; padding: 0; margin: 0;
+    pointer-events: none;
+  }
+  .bday-native::-webkit-calendar-picker-indicator { opacity: 0; }
+
+  /* frame the date input's native calendar icon so it reads as the same
+     bordered button as the location pin in the address field */
+  input[type="date"].input::-webkit-calendar-picker-indicator {
+    width: 17px; height: 17px;
+    padding: 7px;
+    margin: 0 -2px 0 0;
+    border-radius: 10px;
+    background-color: var(--paper-2);
+    border: 1.5px solid var(--rule);
+    cursor: pointer;
+    transition: background-color .15s ease, border-color .15s ease;
+  }
+  input[type="date"].input::-webkit-calendar-picker-indicator:hover {
+    background-color: var(--paper-3);
+    border-color: rgba(42,37,32,0.3);
+  }
+  form.single input[type="date"].input { height: 50px; min-height: 50px; padding-top: 6px; padding-bottom: 6px; }
+  .opt-tag {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--ink-soft);
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    padding: 1px 7px; border-radius: 999px; letter-spacing: 0.05em; font-size: 10px;
+  }
+
+  /* large single input */
+  .input {
+    width: 100%;
+    font-family: inherit;
+    font-size: 18px;
+    color: var(--ink);
+    background: #FCF6E9;
+    border: 2px solid var(--rule);
+    border-radius: 14px;
+    padding: 16px 18px;
+    transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
+  }
+  .input::placeholder { color: #A99B82; }
+  /* match the date input's dd/mm/yyyy placeholder to the same soft tone */
+  input[type="date"].input.is-empty::-webkit-datetime-edit { color: #A99B82; }
+  .input:hover { border-color: rgba(42,37,32,0.3); }
+  .input:focus {
+    outline: none;
+    border-color: var(--coral-deep);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(214,118,75,0.16);
+  }
+  input[type="date"].input { height: 50px; }
+  .input.shake { animation: shake .4s; border-color: var(--coral-deep); }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-7px); } 40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); } 80% { transform: translateX(3px); }
+  }
+
+  /* optional "goodies" group — wraps birthday + address */
+  .goodies {
+    border: 1.5px dashed rgba(47,107,62,0.42);
+    background:
+      linear-gradient(0deg, rgba(47,107,62,0.05), rgba(47,107,62,0.05)),
+      var(--paper);
+    border-radius: 16px;
+    padding: clamp(13px, 2vh, 17px) clamp(14px, 2vw, 18px) clamp(15px, 2.2vh, 19px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(11px, 1.7vh, 15px);
+  }
+  .goodies-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .goodies-note {
+    margin: 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    font-size: clamp(13px, 1.6vh, 14.5px);
+    line-height: 1.4;
+    color: var(--leaf-deep);
+    text-wrap: pretty;
+  }
+  .goodies-head .opt-tag { flex-shrink: 0; margin-top: 4px; }
+  .goodies-mark {
+    flex-shrink: 0;
+    color: var(--coral-deep);
+    font-size: 15px;
+    line-height: 1.35;
+  }
+
+  /* form-side brand mark, bottom-right where socials used to anchor */
+  .brand-corner {
+    height: clamp(30px, 4.2vh, 40px);
+    width: auto;
+    opacity: 0.72;
+    flex-shrink: 0;
+    transition: filter .16s ease, opacity .16s ease;
+  }
+  .brand-corner-link:hover .brand-corner { filter: brightness(0); opacity: 1; }
+
+  /* nav row */
+  .nav {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+    margin-top: clamp(20px, 3.2vh, 30px);
+  }
+  .nav-right { display: flex; align-items: center; gap: 8px; }
+  .btn-text {
+    background: none; border: none; cursor: pointer;
+    font-family: inherit; font-weight: 600; font-size: 15px;
+    color: var(--ink-soft);
+    padding: 11px 10px;
+    border-radius: 10px;
+    transition: color .15s ease, background .15s ease;
+  }
+  .btn-text:hover { color: var(--ink); background: var(--paper-2); }
+  .btn-text[hidden] { display: none; }
+
+  .next {
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 14px 26px; border-radius: 999px;
+    font-family: inherit; font-weight: 700; font-size: 16px;
+    color: #fff; background: var(--coral); border: 2px solid var(--coral-deep);
+    box-shadow: 0 4px 0 0 var(--coral-deep); cursor: pointer;
+    transition: transform .16s ease, box-shadow .16s ease, background .16s ease;
+    white-space: nowrap;
+  }
+  .next:hover { transform: translateY(-2px); box-shadow: 0 6px 0 0 var(--coral-deep); background: #eca47e; }
+  .next:active { transform: translateY(2px); box-shadow: 0 2px 0 0 var(--coral-deep); }
+
+  /* submit */
+  .submit {
+    margin-top: clamp(15px, 2.4vh, 22px);
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 11px;
+    padding: 15px 24px;
+    border-radius: 999px;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.01em;
+    color: #fff;
+    background: var(--coral);
+    border: 2px solid var(--coral-deep);
+    box-shadow: 0 4px 0 0 var(--coral-deep);
+    cursor: pointer;
+    transition: transform .16s ease, box-shadow .16s ease, background .16s ease;
+  }
+  .submit:hover { transform: translateY(-2px); box-shadow: 0 6px 0 0 var(--coral-deep); background: #eca47e; }
+  .submit:active { transform: translateY(2px); box-shadow: 0 2px 0 0 var(--coral-deep); }
+  .submit .acorn { font-size: 18px; line-height: 1; }
+
+  .reassure {
+    margin-top: clamp(10px, 1.6vh, 14px);
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    display: flex; align-items: center; gap: 7px;
+    justify-content: center;
+  }
+  .reassure svg { color: var(--leaf); flex-shrink: 0; }
+
+  /* socials */
+  .socials {
+    position: relative;
+    margin-top: clamp(15px, 2.6vh, 24px);
+    padding-top: clamp(13px, 2vh, 18px);
+    border-top: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+  }
+  .social-list { display: flex; gap: 9px; }
+  .social-list a,
+  .social-list .disabled {
+    width: 38px; height: 38px;
+    display: grid; place-items: center;
+    border-radius: 50%;
+    color: var(--ink);
+    background: var(--paper-2);
+    border: 1.5px solid var(--rule);
+    transition: transform .15s ease, background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .social-list a:hover {
+    transform: translateY(-3px);
+    background: var(--leaf);
+    color: #FBF3E2;
+    border-color: var(--leaf-deep);
+  }
+  .social-list .disabled {
+    opacity: 0.32;
+    cursor: not-allowed;
+    position: relative;
+  }
+  .social-list .disabled:hover { opacity: 0.5; }
+  /* "coming soon" tooltip on hover */
+  .social-list .disabled::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    white-space: nowrap;
+    padding: 5px 9px;
+    border-radius: 7px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .15s ease, transform .15s ease;
+    z-index: 5;
+  }
+  .social-list .disabled::before {
+    content: "";
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    border: 4px solid transparent;
+    border-top-color: var(--ink);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .15s ease, transform .15s ease;
+    z-index: 5;
+  }
+  .social-list .disabled:hover::after,
+  .social-list .disabled:hover::before {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .social-list svg { width: 17px; height: 17px; display: block; }
+  .social-list svg.bgg-mark { width: 23px; height: auto; }
+  .brand-corner-link { display: inline-flex; line-height: 0; }
+  .copyright {
+    position: absolute;
+    top: calc(100% + 5px);
+    right: 0;
+    font-size: 10.5px;
+    line-height: 1.3;
+    color: var(--ink-soft);
+    opacity: 0.62;
+    text-align: right;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  /* ===================== SUCCESS ===================== */
+  .success {
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .success.show { animation: pop .45s cubic-bezier(.2,.9,.3,1.2); }
+    /* form re-entering via "Add another Early Bird" fades in the same way */
+    #formState.reveal { animation: pop .45s cubic-bezier(.2,.9,.3,1.2); }
+  }
+  @keyframes pop { from { opacity: 0; transform: translateY(14px) scale(.97); } to { opacity: 1; transform: none; } }
+  .success.show { display: flex; }
+  .success .badge-line {
+    display: inline-flex; align-items: center; gap: 12px;
+  }
+  .success h1 { font-size: clamp(34px, 4.6vh, 50px); }
+  .success h1 em { font-style: normal; color: var(--coral-deep); }
+  .success p { margin: 0; color: var(--ink-soft); font-size: 16px; max-width: 40ch; text-wrap: pretty; }
+  .success .chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--leaf);
+    background: color-mix(in oklab, var(--leaf) 13%, var(--paper));
+    padding: 8px 14px; border-radius: 999px;
+  }
+
+  /* ===================== RESPONSIVE ===================== */
+  @media (max-width: 880px) {
+    body { overflow: auto; }
+    .stage { grid-template-columns: 1fr; height: auto; min-height: 100dvh; }
+    .hero { min-height: 34vh; }
+    /* stacked layout: the vertical tear no longer applies — the paper panel
+       instead tears upward over the bottom of the hero photo. */
+    .tear { display: none; }
+    .panel {
+      margin-top: -22px;
+      padding-top: 74px;
+      -webkit-clip-path: polygon(
+        0% 22px, 8% 22px, 12% 28px, 19% 14px, 26% 14px, 31% 20px, 38% 12px,
+        45% 12px, 50% 18px, 57% 26px, 63% 13px, 70% 13px, 75% 19px, 82% 11px,
+        89% 11px, 94% 17px, 100% 14px, 100% 100%, 0% 100%);
+      clip-path: polygon(
+        0% 22px, 8% 22px, 12% 28px, 19% 14px, 26% 14px, 31% 20px, 38% 12px,
+        45% 12px, 50% 18px, 57% 26px, 63% 13px, 70% 13px, 75% 19px, 82% 11px,
+        89% 11px, 94% 17px, 100% 14px, 100% 100%, 0% 100%);
+    }
+    .hero-copy h2 { max-width: none; }
+    .panel { padding: 30px 22px 36px; }
+    /* push the heading clear of the organic torn edge on mobile */
+    .lede h1 { margin-top: 20px; }
+    /* postal address gets its own row on mobile so it isn't cramped beside birthday */
+    .goodies .grid.two { grid-template-columns: 1fr; }
+    /* shift the hero artwork down so the animal's face isn't cropped on load */
+    .parallax .layer { object-position: 47% 8%; }
+  }
+  @media (max-width: 460px) {
+    .grid { grid-template-columns: 1fr; }
+    .socials { gap: 14px; }
+  }
+  /* short landscape screens: keep it breathing but allow scroll if truly tiny */
+  @media (max-height: 640px) and (min-width: 881px) {
+    body { overflow-y: auto; }
+    .panel { justify-content: flex-start; padding-top: 26px; padding-bottom: 44px; }
+  }
+</style>
+<link id="gfont-Oswald" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&amp;display=swap">
+<link id="gfont-Merriweather" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;500;600;700&amp;display=swap">
+<link id="gfont-Space-Grotesk" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap">
+<link id="gfont-Josefin-Sans" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600;700&amp;display=swap">
+<link id="gfont-Righteous" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Righteous:wght@300;400;500;600;700&amp;display=swap">
+<link id="gfont-Quicksand" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&amp;display=swap">
+<link id="gfont-Pacifico" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pacifico:wght@300;400;500;600;700&amp;display=swap">
+<link id="gfont-Permanent-Marker" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Permanent+Marker:wght@300;400;500;600;700&amp;display=swap">
+<link id="gfont-Architects-Daughter" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Architects+Daughter:wght@300;400;500;600;700&amp;display=swap">
+</head>
+<body>
+  <main class="stage">
+
+    <!-- ============ HERO ============ -->
+    <section class="hero" aria-hidden="true">
+      <div class="parallax" id="parallax">
+        <div class="scene is-active" data-scene="a">
+          <img class="layer sky" src="assets/nutty-sky.png" alt="" />
+          <img class="layer bubbles-back" alt="" style="display:none" />
+          <img class="layer tree" src="assets/nutty-tree.png" alt="" />
+          <img class="layer branch" src="assets/Nutty_Branch.png" alt="" />
+          <img class="layer solo" src="assets/Nutty_Solo.png" alt="" />
+          <img class="layer bubbles-front" alt="" style="display:none" />
+        </div>
+        <div class="scene" data-scene="b" aria-hidden="true">
+          <img class="layer sky" alt="" />
+          <img class="layer bubbles-back" alt="" style="display:none" />
+          <img class="layer tree" alt="" />
+          <img class="layer branch" alt="" />
+          <img class="layer solo" alt="" style="display:none" />
+          <img class="layer bubbles-front" alt="" style="display:none" />
+        </div>
+      </div>
+      <img class="hero-logo" src="assets/landing-logo.png" alt="Thrive" />
+      <div class="hero-copy">
+        <h2 style="text-shadow: 0 2px 8px rgba(0,0,0,0.45), 0 1px 3px rgba(0,0,0,0.3);"><span style="color:#e89870"><span class="hero-adj" id="heroAdj">Cute</span> animals.</span><br><span style="color:#70e8a6">W</span><span style="color:#70e8c0">i</span><span style="color:#70e877">l</span><span style="color:#70e89f">d</span> <span style="color:#44be74">s</span><span style="color:#70e8a6">c</span><span style="color:#70e8c0">e</span><span style="color:#70e877">n</span><span style="color:#70e89f">a</span><span style="color:#44be74">r</span><span style="color:#70e8a6">i</span><span style="color:#70e8c0">o</span><span style="color:#70e877">s</span><span style="color:#70e89f">.</span></h2>
+      </div>
+    </section>
+
+    <!-- ============ ORGANIC TORN DIVIDER ============ -->
+    <div class="tear" aria-hidden="true"></div>
+
+    <!-- ============ FORM PANEL ============ -->
+    <section class="panel">
+      <div class="page-stamp" aria-hidden="true"></div>
+      <div class="panel-inner">
+
+        <div class="states-wrap">
+        <!-- FORM STATE (single panel — all fields at once) -->
+        <div id="formState">
+          <div class="lede">
+                        <h1><span class="h-ink" style="margin: 0px; padding: 0px">Become an </span><em>Early Bird</em><span class="h-accent">!</span></h1>
+            <p style="font-family: &quot;Bricolage Grotesque&quot;; font-size: 17px; margin: 12px 0px 0px">Be the first to play Thrive, an upcoming indie card game all about cute animals surviving in the wild.</p>
+          </div>
+
+          <form id="waitlistForm" class="single" novalidate>
+            <div aria-hidden="true" style="position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden;">
+              <label for="company">Company</label>
+              <input id="company" name="company" type="text" tabindex="-1" autocomplete="off" />
+            </div>
+            <div class="field" data-key="name" data-required="1">
+              <label class="fl" for="firstName" style="font-family: &quot;Bricolage Grotesque&quot;; font-size: 11px">Name <span class="req-tag">required</span></label>
+              <div class="grid two">
+                <input class="input" id="firstName" name="firstName" type="text" placeholder="First" autocomplete="given-name" required />
+                <input class="input" id="lastName" name="lastName" type="text" placeholder="Last" autocomplete="family-name" required />
+              </div>
+            </div>
+
+            <div class="field" data-key="email" data-required="1">
+              <label class="fl" for="email" style="font-family: &quot;Bricolage Grotesque&quot;">Email <span class="req-tag">required</span></label>
+              <input class="input" id="email" name="email" type="email" placeholder="example@example.com" autocomplete="email" required />
+            </div>
+
+            <div class="field" data-key="animal" data-required="0">
+              <label class="fl" for="animal" style="font-family: &quot;Bricolage Grotesque&quot;">Favourite wild animal <span class="opt-tag">optional</span></label>
+              <div class="input-row">
+                <div class="animal-wrap">
+                  <input class="input" id="animal" name="animal" type="text" placeholder="e.g. Squirrel" />
+                  <button class="animal-clear" id="animalClear" type="button" title="Clear" aria-label="Clear favourite animal" hidden>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+                  </button>
+                </div>
+                <button class="dice-btn" id="randomAnimal" type="button" title="Pick one for me" style="font-family: &quot;Bricolage Grotesque&quot;">Suggest</button>
+                <input type="hidden" id="animalSource" name="animalSource" value="" />
+              </div>
+            </div>
+
+            <div class="goodies">
+              <div class="goodies-head">
+                <p class="goodies-note" style="font-family: &quot;Bricolage Grotesque&quot;; font-size: 23px; font-weight: 700">Want Goodies?</p>
+                <span class="opt-tag" style="font-weight: 700">OPTIONAL</span>
+              </div>
+              <div class="grid two">
+                <div class="field" data-key="birthday" data-required="0">
+                  <label class="fl" for="birthday" style="font-family: &quot;Bricolage Grotesque&quot;">Birthday</label>
+                  <div class="input-wrap">
+                    <input class="input has-geo" id="birthday" name="birthday" type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/yyyy" autocomplete="bday" />
+                    <input class="bday-native" id="bdayNative" type="date" tabindex="-1" aria-hidden="true" />
+                    <button class="geo-btn" id="bdayPicker" type="button" title="Pick a date" aria-label="Open date picker">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="field" data-key="address" data-required="0">
+                  <label class="fl" for="address" style="font-family: &quot;Bricolage Grotesque&quot;">Postal address</label>
+                  <div class="input-wrap">
+                    <input class="input has-geo" id="address" name="address" type="text" placeholder="Street, city, postcode" autocomplete="street-address" />
+                    <button class="geo-btn" id="geoBtn" type="button" title="Use my current location" aria-label="Use my current location">
+                      <svg class="pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-10.5A6.5 6.5 0 0 1 12 4a6.5 6.5 0 0 1 6.5 6.5C18.5 15.4 12 21 12 21Z"/><circle cx="12" cy="10.5" r="2.4"/></svg>
+                      <svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 9 9"/></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button class="submit" id="submitBtn" type="submit" style="margin: 0px; font-family: &quot;Bricolage Grotesque&quot;; font-size: 26px">
+              Join the Waitlist
+            </button>
+            <p id="formError" role="alert" style="display:none; margin:12px 0 0; text-align:center; color:#c0472b; font-family:'Bricolage Grotesque'; font-size:14.5px;"></p>
+          </form>
+        </div>
+
+        <!-- SUCCESS STATE -->
+        <div class="success" id="successState">
+          <h1><span style="color:#245530">Welcome, </span><em id="successName">Early Bird</em><span style="color:#d6764b">!</span></h1>
+          <p style="font-family: &quot;Bricolage Grotesque&quot;; font-size: 17px">You're officially on the Thrive waitlist 🎉<br><span style="display:block; height:0.5em"></span>Keep an eye on your inbox, we’ll share all of the important updates as we get closer to launch!</p>
+          <button class="submit" type="button" id="editAnother" style="width:auto; padding:13px 22px; font-size:15px; white-space:nowrap;">Add another Early Bird
+↩</button>
+        </div>
+        </div>
+
+        <!-- SOCIALS (persist across states) -->
+        <div class="socials">
+          <div class="social-list">
+            <a href="https://instagram.com/thrive.card.game" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.6" cy="6.4" r="1.1" fill="currentColor" stroke="none"/></svg>
+            </a>
+            <a href="https://facebook.com/thrivecardgame" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12Z"/></svg></a>
+            <a href="https://youtube.com/@ThriveCardGame" target="_blank" rel="noopener" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22.5 7.2a3 3 0 0 0-2.1-2.1C18.6 4.6 12 4.6 12 4.6s-6.6 0-8.4.5A3 3 0 0 0 1.5 7.2C1 9 1 12 1 12s0 3 .5 4.8a3 3 0 0 0 2.1 2.1c1.8.5 8.4.5 8.4.5s6.6 0 8.4-.5a3 3 0 0 0 2.1-2.1C23 15 23 12 23 12s0-3-.5-4.8ZM9.9 15.4V8.6l5.7 3.4-5.7 3.4z"/></svg></a>
+            <a href="https://x.com/thrivecardgame" target="_blank" rel="noopener" aria-label="X" title="X"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.9 3h3l-6.6 7.5L22 21h-6.1l-4.8-6.2L5.6 21H2.5l7-8L2 3h6.2l4.3 5.7L17.9 3Zm-1.1 16.2h1.7L7.3 4.7H5.5l11.3 14.5Z"/></svg></a>
+            <a href="mailto:hey@thrive.com" aria-label="Email" title="hey@thrive.com"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/></svg></a>
+          </div>
+          <a class="brand-corner-link" href="https://www.avant-card.com" target="_blank" rel="noopener" aria-label="Avant Card">
+            <img class="brand-corner" id="brandCorner" src="assets/avant-solo.svg" alt="Avant" />
+          </a>
+          <span class="copyright">Copyright &copy; 2026 Avant-Card Games. All Rights Reserved.</span>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      // ===== Google Sheets endpoint =====
+      // Paste the deployed Apps Script Web App URL between the quotes.
+      // Leave blank to keep the page in demo mode (shows success without saving).
+      var WAITLIST_ENDPOINT = ''; // e.g. 'https://script.google.com/macros/s/XXXX/exec'
+
+      var form = document.getElementById('waitlistForm');
+      var formState = document.getElementById('formState');
+      var successState = document.getElementById('successState');
+      var successName = document.getElementById('successName');
+      var editAnother = document.getElementById('editAnother');
+      var fields = [].slice.call(form.querySelectorAll('.field'));
+      var statesWrap = document.querySelector('.states-wrap');
+      var pageStamp = document.querySelector('.page-stamp');
+      var panelInner = document.querySelector('.panel-inner');
+
+      // final resting look of the celebratory stamp — driven by the Tweaks panel
+      var stampTweaks = {
+        stampX: 92, stampY: 76, stampRot: 12, stampScale: 175,
+        stampColor: '#E7C16A', stampOpacity: 45, stampEase: 'smooth'
+      };
+      var REST_ROT = 15, REST_OP = 0.16;   // CSS resting transform/opacity
+      var stampRAF = null;
+      var REST_COLOR = '#6B4A2A';   // .page-stamp resting --acorn fill
+      // easing menu — all monotonic except "bounce" which overshoots
+      var EASINGS = {
+        smooth: function (x) { return 1 - Math.pow(1 - x, 3); },                      // easeOutCubic
+        gentle: function (x) { return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; }, // easeInOutCubic
+        snappy: function (x) { return 1 - Math.pow(1 - x, 5); },                      // easeOutQuint
+        bounce: function (x) { var c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); } // easeOutBack
+      };
+      function stampEase() { return EASINGS[stampTweaks.stampEase] || EASINGS.smooth; }
+      // mix two #rrggbb colors, k=0 -> a, k=1 -> b
+      function mixHex(a, b, k) {
+        var pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16);
+        var ar = pa >> 16, ag = (pa >> 8) & 255, ab = pa & 255;
+        var br = pb >> 16, bg = (pb >> 8) & 255, bb = pb & 255;
+        return 'rgb(' + Math.round(ar + (br - ar) * k) + ',' + Math.round(ag + (bg - ag) * k) + ',' + Math.round(ab + (bb - ab) * k) + ')';
+      }
+
+      // place the faded stamp at its tweakable final spot. Position is a 0–100%
+      // fraction of the free space inside the panel, so it never bleeds out.
+      // Measured from the untransformed box so repeated live updates stay exact.
+      // The swoop is driven by a JS rAF tween (CSS transitions are frozen in the
+      // editor preview), so it plays identically everywhere.
+      // measure the resting box and resolve the swooped target geometry.
+      // returns { dx, dy, scale, rot, op, color } describing the p=1 (landed) state.
+      function computeStampTarget() {
+        pageStamp.style.transition = 'none';
+        pageStamp.style.transform = '';            // measure resting box
+        void pageStamp.offsetWidth;
+        var panel = document.querySelector('.panel').getBoundingClientRect();
+        var rect = pageStamp.getBoundingClientRect();
+        var cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
+        var scale = stampTweaks.stampScale / 100;
+        var fw = pageStamp.offsetWidth * scale, fh = pageStamp.offsetHeight * scale;
+        var margin = 14;
+        var availW = Math.max(0, panel.width - fw - margin * 2);
+        var availH = Math.max(0, panel.height - fh - margin * 2);
+        var targetLeft = panel.left + margin + (stampTweaks.stampX / 100) * availW;
+        var targetTop = panel.top + margin + (stampTweaks.stampY / 100) * availH;
+        return {
+          dx: Math.round(targetLeft + fw / 2 - cx),
+          dy: Math.round(targetTop + fh / 2 - cy),
+          scale: scale,
+          rot: stampTweaks.stampRot,
+          op: stampTweaks.stampOpacity / 100,
+          color: stampTweaks.stampColor
+        };
+      }
+      // render the stamp at eased progress p (0 = resting, 1 = landed) for
+      // target g. Every channel — position, scale, rotation, opacity AND
+      // colour — interpolates by the same p, so the fill fades together with
+      // the motion in both directions.
+      function renderStampFrame(g, p) {
+        pageStamp.style.transform = 'translate(' + (g.dx * p) + 'px,' + (g.dy * p) + 'px) scale('
+          + (1 + (g.scale - 1) * p) + ') rotate(' + (REST_ROT + (g.rot - REST_ROT) * p) + 'deg)';
+        pageStamp.style.opacity = (REST_OP + (g.op - REST_OP) * p).toString();
+        pageStamp.style.background = mixHex(REST_COLOR, g.color, p);
+      }
+      // tween spatial progress over `dur` ms. dir 'in' eases rest->landed,
+      // dir 'out' eases landed->rest; both decelerate into their final state.
+      function tweenStamp(g, dir, dur, onDone) {
+        var ease = stampEase(), t0 = null;
+        function step(ts) {
+          if (t0 === null) { t0 = ts; }
+          var k = Math.min(1, (ts - t0) / dur);
+          var p = dir === 'out' ? 1 - ease(k) : ease(k);
+          renderStampFrame(g, p);
+          if (k < 1) { stampRAF = requestAnimationFrame(step); }
+          else { stampRAF = null; if (onDone) { onDone(); } }
+        }
+        stampRAF = requestAnimationFrame(step);
+      }
+      // the swoop in: rest -> landed
+      function applyStamp(animate) {
+        if (!pageStamp) { return; }
+        if (stampRAF) { cancelAnimationFrame(stampRAF); stampRAF = null; }
+        var g = computeStampTarget();
+        if (!animate) { renderStampFrame(g, 1); return; }   // instant for live fiddling
+        tweenStamp(g, 'in', 950);
+      }
+      // the swoop back out: landed -> rest, then clear inline styles
+      function resetStamp() {
+        if (!pageStamp) { return; }
+        if (stampRAF) { cancelAnimationFrame(stampRAF); stampRAF = null; }
+        // resolve target geometry, then re-pin to the landed state so the
+        // measure step in computeStampTarget doesn't visibly flash to rest.
+        var g = computeStampTarget();
+        renderStampFrame(g, 1);
+        void pageStamp.offsetWidth;
+        tweenStamp(g, 'out', 720, function () {
+          pageStamp.style.transition = 'none';
+          pageStamp.style.transform = '';
+          pageStamp.style.opacity = '';
+          pageStamp.style.background = '';
+        });
+      }
+      // bridge from the Tweaks panel — stores values + live-updates if shown
+      window.__applyStampTweaks = function (t) {
+        if (!t) { return; }
+        ['stampX', 'stampY', 'stampRot', 'stampScale', 'stampColor', 'stampOpacity', 'stampEase'].forEach(function (k) {
+          if (t[k] !== undefined && t[k] !== null) { stampTweaks[k] = t[k]; }
+        });
+        if (successState && successState.classList.contains('show')) { applyStamp(false); }
+      };
+
+      function inputOf(f) { return f.querySelector('.input'); }
+      function isRequired(f) { return f.getAttribute('data-required') === '1'; }
+
+      function validateInput(el) {
+        var v = (el.value || '').trim();
+        var ok = !!v;
+        if (ok && el.type === 'email') {
+          ok = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v);
+        }
+        if (!ok) {
+          el.classList.remove('shake');
+          void el.offsetWidth; // restart animation
+          el.classList.add('shake');
+        }
+        return ok;
+      }
+
+      function validateField(f) {
+        if (!isRequired(f)) { return true; }
+        var inputs = [].slice.call(f.querySelectorAll('.input'));
+        var allOk = true;
+        inputs.forEach(function (el) { if (!validateInput(el)) { allOk = false; } });
+        return allOk;
+      }
+
+      function finish() {
+        var first = (document.getElementById('firstName').value || '').trim().split(/\s+/)[0];
+        successName.textContent = first || 'Early Bird';
+        if (statesWrap) { statesWrap.style.minHeight = formState.offsetHeight + 'px'; }
+        applyStamp(true);
+        formState.style.display = 'none';
+        successState.classList.add('show');
+      }
+
+      function submitForm() {
+        var firstBad = null;
+        fields.forEach(function (f) {
+          var ok = validateField(f);
+          if (!ok && !firstBad) { firstBad = f.querySelector('.input.shake') || inputOf(f); }
+        });
+        if (firstBad) { firstBad.focus(); return; }
+        sendToSheet();
+      }
+
+      var submitBtn = document.getElementById('submitBtn');
+      var formError = document.getElementById('formError');
+      var submitting = false;
+
+      function sendToSheet() {
+        // Honeypot: bots fill the hidden "company" field. Fake success, save nothing.
+        var hp = form.elements['company'];
+        if (hp && hp.value) { finish(); return; }
+        // Demo mode: no endpoint configured yet — just show success.
+        if (!WAITLIST_ENDPOINT) { finish(); return; }
+        if (submitting) { return; }
+        submitting = true;
+        if (formError) { formError.style.display = 'none'; }
+        var label = submitBtn ? submitBtn.textContent : '';
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Joining\u2026'; }
+
+        var payload = new URLSearchParams();
+        [].forEach.call(form.elements, function (el) {
+          if (el.name && el.type !== 'button' && el.type !== 'submit') {
+            payload.append(el.name, el.value || '');
+          }
+        });
+        payload.append('submittedAt', new Date().toISOString());
+
+        fetch(WAITLIST_ENDPOINT, {
+          method: 'POST',
+          mode: 'no-cors',
+          body: payload
+        }).then(function () {
+          submitting = false;
+          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = label; }
+          finish();
+        }).catch(function () {
+          submitting = false;
+          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = label; }
+          if (formError) {
+            formError.textContent = 'Something went wrong \u2014 please check your connection and try again.';
+            formError.style.display = 'block';
+          }
+        });
+      }
+
+      form.addEventListener('submit', function (e) { e.preventDefault(); submitForm(); });
+
+      // clear the shake state as soon as the user types
+      form.addEventListener('input', function (e) {
+        if (e.target.classList.contains('input')) { e.target.classList.remove('shake'); }
+      });
+
+      // Randomise the favourite animal so nobody gets stuck on it
+      var ANIMALS = ['Lion','Tiger','Wolf','Fox','Coyote','Jackal','Hyena','Bear','Panda','Koala','Kangaroo','Wombat','Platypus','Tasmanian Devil','Elephant','Rhinoceros','Hippopotamus','Giraffe','Zebra','Antelope','Gazelle','Moose','Camel','Llama','Goat','Horse','Gorilla','Orangutan','Monkey','Lemur','Sloth','Otter','Beaver','Capybara','Rabbit','Squirrel','Raccoon','Badger','Meerkat','Mongoose','Skunk','Armadillo','Anteater','Tapir','Mole','Bat','Manatee','Dugong','Eagle','Hawk','Falcon','Owl','Crow','Parrot','Cockatoo','Toucan','Flamingo','Penguin','Peacock','Pelican','Seagull','Heron','Vulture','Kookaburra','Ostrich','Emu','Kiwi','Duck','Goose','Crocodile','Alligator','Turtle','Tortoise','Snake','Lizard','Chameleon','Gecko','Iguana','Komodo Dragon','Frog','Toad','Salamander','Newt','Axolotl','Shark','Dolphin','Whale','Orca','Narwhal','Seal','Sea Lion','Walrus','Octopus','Squid','Jellyfish','Stingray','Eel','Swordfish','Marlin','Tuna','Pufferfish','Seahorse','Clownfish','Starfish','Crab','Lobster','Shrimp','Prawn','Butterfly','Moth','Dragonfly','Bee','Wasp','Ant','Ladybug','Beetle','Firefly','Mantis','Grasshopper','Cricket','Caterpillar','Spider','Scorpion','Centipede','Snail','Slug','Worm'];
+      var randomBtn = document.getElementById('randomAnimal');
+      var animalInput = document.getElementById('animal');
+      var animalClear = document.getElementById('animalClear');
+      var animalSource = document.getElementById('animalSource');
+      function setAnimalSource(v) { if (animalSource) { animalSource.value = v; } }
+      function syncAnimalClear() { if (animalClear) { animalClear.hidden = !(animalInput.value || '').trim(); } }
+      if (animalInput) {
+        syncAnimalClear();
+        // manual typing overrides the suggested flag
+        animalInput.addEventListener('input', function () {
+          setAnimalSource((animalInput.value || '').trim() ? 'typed' : '');
+          syncAnimalClear();
+        });
+      }
+      if (animalClear && animalInput) {
+        animalClear.addEventListener('click', function () {
+          animalInput.value = '';
+          setAnimalSource('');
+          syncAnimalClear();
+          animalInput.focus();
+        });
+      }
+      if (randomBtn && animalInput) {
+        var rolling = false;
+        randomBtn.addEventListener('click', function () {
+          if (rolling) { return; }
+          var pick = animalInput.value.trim();
+          var next = pick;
+          // avoid landing on the same value twice in a row
+          while (next === pick && ANIMALS.length > 1) {
+            next = ANIMALS[Math.floor(Math.random() * ANIMALS.length)];
+          }
+          setAnimalSource('suggest');
+          animalInput.classList.remove('shake');
+          randomBtn.classList.remove('spin');
+          void randomBtn.offsetWidth;
+          randomBtn.classList.add('spin');
+
+          // slot-machine roll: flick through a few names, decelerating, then
+          // land on the pick with a little pop. Respects reduced-motion.
+          var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          if (reduce) {
+            animalInput.value = next;
+            syncAnimalClear();
+            return;
+          }
+          rolling = true;
+          randomBtn.disabled = true;
+          animalInput.classList.add('rolling');
+          var ticks = 11;         // total flickers before landing
+          var i = 0;
+          var delay = 45;         // starts fast
+          (function step() {
+            if (i < ticks) {
+              var r = ANIMALS[Math.floor(Math.random() * ANIMALS.length)];
+              animalInput.value = r;
+              syncAnimalClear();
+              i++;
+              delay += i * 7;     // ease-out: each flick a touch slower
+              setTimeout(step, delay);
+            } else {
+              animalInput.value = next;
+              syncAnimalClear();
+              animalInput.classList.remove('rolling');
+              void animalInput.offsetWidth;
+              animalInput.classList.add('landed');
+              setTimeout(function () { animalInput.classList.remove('landed'); }, 420);
+              rolling = false;
+              randomBtn.disabled = false;
+            }
+          })();
+        });
+      }
+
+      // Birthday: free typing with auto-slashes (12061990 -> 12/06/1990),
+      // plus a calendar button that opens the native date picker
+      var birthday = document.getElementById('birthday');
+      var bdayNative = document.getElementById('bdayNative');
+      var bdayPicker = document.getElementById('bdayPicker');
+      if (birthday) {
+        var formatBday = function (raw) {
+          var d = raw.replace(/\D/g, '').slice(0, 8);
+          var out = d.slice(0, 2);
+          if (d.length > 2) { out += '/' + d.slice(2, 4); }
+          if (d.length > 4) { out += '/' + d.slice(4, 8); }
+          return out;
+        };
+        var toISO = function (v) {
+          var m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec((v || '').trim());
+          if (!m) { return ''; }
+          var dd = +m[1], mm = +m[2], yyyy = +m[3];
+          if (mm < 1 || mm > 12 || dd < 1 || dd > 31) { return ''; }
+          return m[3] + '-' + m[2] + '-' + m[1];
+        };
+
+        birthday.addEventListener('input', function () {
+          var atEnd = birthday.selectionStart === birthday.value.length;
+          birthday.value = formatBday(birthday.value);
+          if (atEnd) {
+            var end = birthday.value.length;
+            try { birthday.setSelectionRange(end, end); } catch (e) {}
+          }
+        });
+
+        if (bdayNative && bdayPicker) {
+          bdayPicker.addEventListener('click', function () {
+            var iso = toISO(birthday.value);
+            if (iso) { bdayNative.value = iso; }
+            if (typeof bdayNative.showPicker === 'function') {
+              try { bdayNative.showPicker(); return; } catch (e) {}
+            }
+            bdayNative.focus();
+          });
+          bdayNative.addEventListener('change', function () {
+            if (bdayNative.value) {
+              var p = bdayNative.value.split('-'); // yyyy-mm-dd
+              birthday.value = p[2] + '/' + p[1] + '/' + p[0];
+              birthday.classList.remove('shake');
+            }
+          });
+        }
+      }
+
+      // "Use my current location" — ask permission, then reverse-geocode to a
+      // readable address (falling back to coordinates)
+      var geoBtn = document.getElementById('geoBtn');
+      var addressInput = document.getElementById('address');
+      if (geoBtn && addressInput) {
+        if (!('geolocation' in navigator)) {
+          geoBtn.style.display = 'none';
+        } else {
+          geoBtn.addEventListener('click', function () {
+            geoBtn.classList.add('loading');
+            addressInput.classList.remove('shake');
+            navigator.geolocation.getCurrentPosition(function (pos) {
+              var lat = pos.coords.latitude, lon = pos.coords.longitude;
+              var coords = lat.toFixed(5) + ', ' + lon.toFixed(5);
+              fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=' + lat + '&lon=' + lon, {
+                headers: { 'Accept': 'application/json' }
+              })
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                  var a = (data && data.address) || {};
+                  var parts = [
+                    [a.house_number, a.road].filter(Boolean).join(' '),
+                    a.suburb || a.neighbourhood || a.village || a.town || a.city || a.county,
+                    a.postcode,
+                    a.country
+                  ].filter(Boolean);
+                  addressInput.value = parts.length ? parts.join(', ') : coords;
+                })
+                .catch(function () { addressInput.value = coords; })
+                .then(function () { geoBtn.classList.remove('loading'); });
+            }, function () {
+              // permission denied or unavailable — nudge the field
+              geoBtn.classList.remove('loading');
+              addressInput.classList.remove('shake');
+              void addressInput.offsetWidth;
+              addressInput.classList.add('shake');
+            }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
+          });
+        }
+      }
+
+      editAnother.addEventListener('click', function () {
+        form.reset();
+        setAnimalSource(''); syncAnimalClear();
+        successState.classList.remove('show');
+        resetStamp();
+        formState.style.display = '';
+        if (statesWrap) { statesWrap.style.minHeight = ''; }
+        formState.classList.remove('reveal');
+        void formState.offsetWidth; // restart animation
+        formState.classList.add('reveal');
+        var first = inputOf(fields[0]);
+        if (first) { try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); } }
+      });
+    })();
+
+    /* ---------- Layered parallax hero ---------- */
+    (function () {
+      var stack = document.getElementById('parallax');
+      if (!stack) { return; }
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+      if (reduce.matches) { document.documentElement.style.setProperty('--shine', '0.5'); return; }
+
+      // target (where input wants it) and current (eased) positions, range ~ -1..1
+      var tx = 0, ty = 0, cx = 0, cy = 0;
+      var sx = 0.5, csh = 0.5; // sheen target / current, range 0..1
+      var lastInput = -9999;
+
+      function setTargetFromXY(clientX, clientY) {
+        tx = (clientX / window.innerWidth - 0.5) * -2;
+        ty = (clientY / window.innerHeight - 0.5) * -2;
+        sx = clientX / window.innerWidth;
+        lastInput = performance.now();
+      }
+
+      window.addEventListener('pointermove', function (e) {
+        setTargetFromXY(e.clientX, e.clientY);
+      }, { passive: true });
+
+      // device tilt for touch / mobile
+      window.addEventListener('deviceorientation', function (e) {
+        if (e.gamma == null || e.beta == null) { return; }
+        tx = Math.max(-1, Math.min(1, e.gamma / 28)) * -1;   // left/right
+        ty = Math.max(-1, Math.min(1, (e.beta - 45) / 28)) * -1; // front/back
+        sx = Math.max(0, Math.min(1, e.gamma / 56 + 0.5));
+        lastInput = performance.now();
+      }, { passive: true });
+
+      function frame(now) {
+        // gentle idle breathing so the scene feels alive with no input
+        var idle = (now - lastInput > 2200) ? 1 : 0;
+        var driftX = Math.sin(now / 3400) * 0.16 * idle;
+        var driftY = Math.cos(now / 4300) * 0.13 * idle;
+
+        cx += ((tx + driftX) - cx) * 0.055;
+        cy += ((ty + driftY) - cy) * 0.055;
+
+        // sheen: follow pointer X; gently sweep when idle
+        var shineTarget = idle ? (0.5 + Math.sin(now / 3000) * 0.42) : sx;
+        csh += (shineTarget - csh) * 0.05;
+        document.documentElement.style.setProperty('--shine', csh.toFixed(3));
+
+        stack.style.setProperty('--mx', cx.toFixed(3));
+        stack.style.setProperty('--my', cy.toFixed(3));
+        document.documentElement.style.setProperty('--mx', cx.toFixed(3));
+        document.documentElement.style.setProperty('--my', cy.toFixed(3));
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    })();
+  </script>
+
+  <script>
+    (function () {
+      var r = document.documentElement.style;
+      r.setProperty('--coral', '#E89870'); r.setProperty('--coral-deep', '#D6764B');
+      r.setProperty('--head-ink', '#245530'); r.setProperty('--hero-y', '5%');
+      r.setProperty('--animal-y', '20px');
+      document.querySelectorAll('.lede h1 .h-accent').forEach(function (el) { el.style.color = 'var(--coral-deep)'; });
+      if (window.__applyStampTweaks) {
+        window.__applyStampTweaks({ stampX: 92, stampY: 76, stampRot: -8, stampScale: 175, stampColor: '#E7C16A', stampOpacity: 45, stampEase: 'smooth' });
+      }
+    })();
+  </script>
+</body>
+</html>
